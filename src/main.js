@@ -1,12 +1,17 @@
 import { getImagesByQuery } from './js/pixabay-api.js';
-import { createGallery, clearGallery, showLoader, hideLoader, showLoadMoreButton, hideLoadMoreButton } from './js/render-functions.js';
+import {
+  createGallery,
+  clearGallery,
+  showLoader,
+  hideLoader,
+  showLoadMoreButton,
+  hideLoadMoreButton
+} from './js/render-functions.js';
 import iziToast from 'izitoast';
 
 // Селектори елементів
-const form = document.querySelector('.form'); // Форма
-const gallery = document.querySelector('.gallery'); // Галерея
-const loadMoreButton = document.querySelector('.load-more'); // Кнопка Load More
-const loader = document.querySelector('.loader'); // Лоадер
+const form = document.querySelector('.form');
+const loadMoreButton = document.querySelector('.load-more');
 
 let currentQuery = '';
 let currentPage = 1;
@@ -20,6 +25,7 @@ form.addEventListener('submit', async event => {
 
   currentQuery = query;
   currentPage = 1;
+
   clearGallery();
   hideLoadMoreButton();
   await fetchAndRenderImages();
@@ -47,24 +53,19 @@ async function fetchAndRenderImages() {
 
     createGallery(hits);
 
-    if (hits.length < 15 || currentPage * 15 >= totalHits) {
+    if (currentPage * 15 >= totalHits) {
       hideLoadMoreButton();
-      iziToast.info({ title: 'Info', message: "We're sorry, but you've reached the end of search results." });
+      iziToast.info({
+        title: 'Info',
+        message: "We're sorry, but you've reached the end of search results."
+      });
     } else {
       showLoadMoreButton();
     }
-
-    scrollPage();
   } catch (error) {
     iziToast.error({ title: 'Error', message: 'Failed to fetch images!' });
     console.error(error);
   } finally {
     hideLoader();
   }
-}
-
-// Функція для прокрутки
-function scrollPage() {
-  const { height: cardHeight } = gallery.firstElementChild?.getBoundingClientRect() || { height: 0 };
-  window.scrollBy({ top: cardHeight * 2, behavior: 'smooth' });
 }
